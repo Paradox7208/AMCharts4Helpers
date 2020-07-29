@@ -43,10 +43,10 @@ function scaleLabels(source, options) {
         return;
     }
 
-    var scaleLabel = function (label) {
+    var scaleLabel = function (label, template) {
         for (var i = 0; i < options.supportedLabelPropertySelectors.length; i++) {
             var labelSelector = options.supportedLabelPropertySelectors[i],
-                labelProperty = findProperty(label, labelSelector);
+                labelProperty = findProperty(label, labelSelector) || findProperty(template, labelSelector);
 
             if (labelProperty) {
                 var labelPropertyNumber = Number(labelProperty);
@@ -76,13 +76,30 @@ function scaleLabels(source, options) {
         if (labels) {
             if (labels.each) {
                 labels.each(function (label, index) {
-                    labels.setIndex(index, scaleLabel(label));
+                    labels.setIndex(index, scaleLabel(label, labels.template));
                 });
             } else if (angular.isObject(labels)) {
-                labels = scaleLabel(labels)
+                labels = scaleLabel(labels, labels.template)
             }
         }
     }
+}
+
+function scalePieChartLabels(maxSizeChangedEvent) {
+    var chart = maxSizeChangedEvent.target,
+        multiplier = getScaleMultiplier(maxSizeChangedEvent),
+        scaleOptions = {
+            multiplier: multiplier
+        };
+
+    if (chart.series && chart.series.each) {
+        scaleOptions.labelSelectors = ['labels']
+        chart.series.each(function (series) {
+            scaleLabels(series, scaleOptions);
+        });
+    }
+
+    console.log(chart);
 }
 
 /* PRIVATE METHODS */
