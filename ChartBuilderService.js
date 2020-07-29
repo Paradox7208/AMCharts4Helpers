@@ -98,8 +98,6 @@ function scalePieChartLabels(maxSizeChangedEvent) {
             scaleLabels(series, scaleOptions);
         });
     }
-
-    console.log(chart);
 }
 
 /* PRIVATE METHODS */
