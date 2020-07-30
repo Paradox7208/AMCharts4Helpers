@@ -1,14 +1,16 @@
 /* PUBLIC FUNCTIONS */
 
-function scaleGaugeChartLabels(maxSizeChangedEvent) {
+function scaleChartLabels(maxSizeChangedEvent) {
     var chart = maxSizeChangedEvent.target,
         multiplier = getScaleMultiplier(maxSizeChangedEvent),
         scaleOptions = {
+            labelSelectors: ['children'],
             multiplier: multiplier
         };
 
+    scaleLabels(chart, scaleOptions);
+
     if (chart.radarContainer) {
-        scaleOptions.labelSelectors = ['children'];
         scaleLabels(chart.radarContainer, scaleOptions);
     }
 
@@ -23,6 +25,13 @@ function scaleGaugeChartLabels(maxSizeChangedEvent) {
                     scaleLabels(axisRange, scaleOptions);
                 });
             }
+        });
+    }
+
+    if (chart.series && chart.series.each) {
+        scaleOptions.labelSelectors = ['labels']
+        chart.series.each(function (series) {
+            scaleLabels(series, scaleOptions);
         });
     }
 }
@@ -53,7 +62,7 @@ function scaleLabels(source, options) {
                 if (!isNaN(labelPropertyNumber)) {
                     labelProperty = (options.multiplier * labelPropertyNumber);
                 } else {
-                    var number = labelProperty.match(/^\d+[^a-zA-Z\.]|^\d+\.{1}\d+/g),
+                    var number = labelProperty.match(/^\d+\.{1}\d*[^a-zA-Z\.]|^\d*[^a-zA-Z\.]/g),
                         format = labelProperty.match(/[a-zA-Z\%]+/g);
 
                     if (number && number.length > 0 && format && format.length > 0) {
@@ -82,21 +91,6 @@ function scaleLabels(source, options) {
                 labels = scaleLabel(labels, labels.template)
             }
         }
-    }
-}
-
-function scalePieChartLabels(maxSizeChangedEvent) {
-    var chart = maxSizeChangedEvent.target,
-        multiplier = getScaleMultiplier(maxSizeChangedEvent),
-        scaleOptions = {
-            multiplier: multiplier
-        };
-
-    if (chart.series && chart.series.each) {
-        scaleOptions.labelSelectors = ['labels']
-        chart.series.each(function (series) {
-            scaleLabels(series, scaleOptions);
-        });
     }
 }
 
